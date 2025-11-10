@@ -1,0 +1,68 @@
+mode: finetune # train | finetune  | test
+
+task:
+    id: null
+    category: text_classification # null | text_classification | token_classification
+    name: topic # Topic Detection
+
+model:
+    architecture: xlmr # bert | roberta | xlnet | electra | xlmr
+    pretrained:
+        name: FacebookAI|xlm-roberta-large
+        source: local # null | local | huggingface
+        checkpoint: null
+
+tokenizer:
+    source: huggingface # local | huggingface
+    name: FacebookAI/xlm-roberta-large
+    type: null # null | wordpiece | sentpiece
+    algorithm: null
+    adapt_to_lm: false
+
+ds:
+    descriptive_name: null
+    category: benchmarks # benchmarks | corpora | collections | raw
+    dirs: text_classification/topic/sib200_hf # sa/imdb_reviews_ka | sa/google_maps_reviews
+    name: null
+    type: huggingface_saved # text | csv | huggingface_saved | huggingface
+    comes_with_splits: 
+        train: true
+        test: true
+        validation: true
+    input:
+        key: inputs
+        standardize_key: false
+    label:
+        key: labels
+        number: 7
+        names:
+        - science/technology
+        - travel
+        - politics
+        - sports
+        - health
+        - entertainment
+        - geography
+        standardize_key: false
+    task_id:
+        key: task_ids
+        standardize_key: false
+    preproc_rules:
+        subset:
+            run: true
+            use: 0.1 # Use only (X*100)% of the dataset
+            save_as: huggingface # false | csv | huggingface
+        
+# While loading configuration 
+# this parameters are added to the environment variables
+env:
+
+    # CUDA_LAUNCH_BLOCKING: '1'
+    PYTORCH_CUDA_ALLOC_CONF: null # max_split_size_mb:128
+
+    # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. 
+    # Disabling parallelism to avoid deadlocks...
+    # To disable this warning, you can either:
+    #         - Avoid using `tokenizers` before the fork if possible
+    #         - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+    TOKENIZERS_PARALLELISM: 'true' # 'true' | 'false'

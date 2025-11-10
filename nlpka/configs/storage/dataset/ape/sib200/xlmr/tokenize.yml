@@ -1,0 +1,87 @@
+mode: finetune # train | finetune  | test
+
+task:
+    id: null
+    category: text_classification # null | text_classification | token_classification
+    name: topic # Topic Detection
+
+model:
+    architecture: xlm # bert | roberta | xlnet | electra | xlm
+    pretrained:
+        name: FacebookAI|xlm-roberta-large
+        source: local # null | local | huggingface
+        checkpoint: null
+
+tokenizer:
+    source: huggingface # local | huggingface
+    name: FacebookAI/xlm-roberta-large
+    type: null # null | wordpiece | sentpiece
+    algorithm: null
+    adapt_to_lm: false
+
+ds:
+    descriptive_name: null
+    category: benchmarks # benchmarks | corpora | collections | raw
+    dirs: text_classification/topic/sib200_hf # sa/imdb_reviews_ka | sa/google_maps_reviews
+    name: null
+    type: huggingface_saved # text | csv | huggingface_saved | huggingface
+    comes_with_splits: 
+        train: true
+        test: true
+        validation: dev
+    input:
+        key: text
+        standardize_key: true
+    label:
+        key: category
+        number: 7
+        names:
+        - science/technology
+        - travel
+        - politics
+        - sports
+        - health
+        - entertainment
+        - geography
+        standardize_key: true
+    task_id:
+        key: task_ids
+        standardize_key: true
+    preproc_rules:
+        tokenize:
+            run: true
+            pre_rules:
+                label_name_to_id: true
+                split_sentences: false # false | kast | nltkst | spacyst
+                append_eos_token: false
+                keep_target_texts_for_save: false
+                text_to_text_rules: false
+            rules:
+                max_length: 164
+                padding: false # max_length | true (longest) | false (do_not_pad) 
+                truncation: true
+                add_special_tokens: true
+                return_special_tokens_mask: false
+                return_token_type_ids: false
+                return_length: true
+                return_tensors: np
+                is_split_into_words: false
+            post_rules:
+                end_truncation_with_eos: false
+                concat_samples: false
+                sort_by_len: false
+            save_as: huggingface # false | csv | huggingface
+        
+# While loading configuration 
+# this parameters are added to the environment variables
+env:
+
+    # CUDA_LAUNCH_BLOCKING: '1'
+    PYTORCH_CUDA_ALLOC_CONF: null # max_split_size_mb:128
+
+    # huggingface/tokenizers: The current process just got forked, after parallelism has already been used. 
+    # Disabling parallelism to avoid deadlocks...
+    # To disable this warning, you can either:
+    #         - Avoid using `tokenizers` before the fork if possible
+    #         - Explicitly set the environment variable TOKENIZERS_PARALLELISM=(true | false)
+    TOKENIZERS_PARALLELISM: 'true' # 'true' | 'false'
