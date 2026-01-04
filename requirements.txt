@@ -1,13 +1,13 @@
 tqdm
 nltk
 peft==0.14.0 # 0.15.0 (STABLE)
+rich
 wandb
 numpy
 spacy
 pyyaml
 pandas
 seqeval
-fasttext
 requests
 datasets
 evaluate

@@ -1,6 +1,7 @@
 .vscode/
 .env
 .cursorignore
+.venv/
 
 .DS_Store
 *.DS_Store

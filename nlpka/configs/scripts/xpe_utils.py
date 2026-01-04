@@ -14,10 +14,10 @@ from nlpka.models.cross_prompt_encoder import CrossPromptEncoderReparameterizati
 import nlpka.datasets.storage as ds_stor
 ds_path = common.get_module_location(ds_stor)
 def get_sib200_meta():
-    meta_path = f'{ds_path}/benchmarks/text_classification/topic/sib200_hf/meta.csv'
+    meta_path = f'{ds_path}/benchmarks/text_classification/topic/sib200_tokenized_xlmr/meta.csv'
     meta = pd.read_csv(meta_path)
     return meta
-    
+
 sib200_meta = get_sib200_meta()
 sib200_ds_names = sib200_meta['code'].tolist()
 xlmr_seen_sib200_ds_names = sib200_meta[sib200_meta['xlmr'] == 1]['code'].tolist()

@@ -23,9 +23,14 @@ config_names = get_dataset_config_names(dataset_name)
 
 # 2. Download each config and 3. Save in a separate folder
 for config_name in config_names:
+    
+    config_save_path = os.path.join(save_path, config_name)
+    if os.path.exists(config_save_path):
+        print(f"Skipping {config_name}; already exists at {config_save_path}")
+        continue
+
     print(f"Downloading config: {config_name}")
     ds = load_dataset(dataset_name, name=config_name)
-    config_save_path = os.path.join(save_path, config_name)
     os.makedirs(config_save_path, exist_ok=True)
     ds.save_to_disk(config_save_path)
     print(f"Saved {config_name} to {config_save_path}")

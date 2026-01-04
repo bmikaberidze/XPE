@@ -19,8 +19,11 @@ from transformers.utils import add_start_docstrings_to_model_forward, replace_re
 # T5_INPUTS_DOCSTRING = T5_INPUTS_DOCSTRING or ""
 # _CONFIG_FOR_DOC = _CONFIG_FOR_DOC or ""
 
-# FlashAttention
-from flash_attn.modules.mha import FlashSelfAttention
+# FlashAttention (optional)
+try:
+    from flash_attn.modules.mha import FlashSelfAttention
+except ImportError:
+    FlashSelfAttention = None
 
 class CustomT5ForConditionalGeneration(T5ForConditionalGeneration):
 
@@ -29,6 +32,11 @@ class CustomT5ForConditionalGeneration(T5ForConditionalGeneration):
         
         # Adjust Flash Attention
         if flash_attn:
+            if FlashSelfAttention is None:
+                raise RuntimeError(
+                    "flash_attn requested but not installed. "
+                    "Install flash-attn or run with flash_attn=False."
+                )
             # Replace layer self-attention
             def replace_self_atten(layer, causal):
                 original_self_attn = layer.layer[0].SelfAttention
