@@ -836,7 +836,6 @@ class CrossPromptEncoderConfig(PromptEncoderConfig):
         encoder_embedding_init_type (`str`): The type of initialization to use for the embedding.
         encoder_init_state_dict_path (`str`): The path to pretraine encoder state for initialization shared embeddings and encoder heads.
         encoder_embedding_freeze (`bool`): The indicator of frozen or trainable embedding.
-        num_tasks (`int`): The number of tasks.        
         modules_to_save (`Optional[List[str]]`):
             List of modules apart from CrossPromptEncoder layers to be set as trainable and saved in the final checkpoint.
         encoder_embedding_normalize (`str`): The type of normalization to use for the embedding (None,unit, clip).
@@ -863,14 +862,6 @@ class CrossPromptEncoderConfig(PromptEncoderConfig):
     encoder_ratio: float = field(
         default=0.25,
         metadata={"help": "The ratio of encoded vs standard input embeddings"},
-    )
-    num_tasks: Optional[int] = field(
-        default=1, 
-        metadata={"help": "The number of tasks"}
-    )
-    task_keys: Optional[List[str]] = field(
-        default=None,
-        metadata={"help": "The keys of the tasks"},
     )
     modules_to_save: Optional[List[str]] = field(
         default=None,
@@ -947,8 +938,6 @@ class CrossPromptEncoder(torch.nn.Module):
     ...     encoder_reparameterization_type="MLP",
     ...     encoder_hidden_size=768,
     ...     encoder_embedding_type="FULLY_SHARED",
-    ...     num_tasks=5,
-    ...     task_keys=["task1", "task2", "task3", "task4", "task5"],
     ... )
 
     >>> prompt_encoder = CrossPromptEncoder(config)
@@ -972,8 +961,6 @@ class CrossPromptEncoder(torch.nn.Module):
 
     def __init__(self, config: CrossPromptEncoderConfig):
         super().__init__()
-        self.num_tasks = config.num_tasks
-        self.task_keys = config.task_keys
         self.token_dim = config.token_dim
         self.input_size = config.encoder_input_size or self.token_dim
         self.output_size = self.token_dim

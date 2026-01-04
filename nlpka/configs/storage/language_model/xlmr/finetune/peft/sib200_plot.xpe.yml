@@ -1,4 +1,4 @@
-mode: finetune # train | finetune  | test
+mode: test # train | finetune  | test
 
 task:
     id: null
@@ -25,16 +25,15 @@ task:
         encoder_dropout: 0.1 # (`float`): The dropout probability of the prompt encoder.
         #    
         ## CrossPromptEncoderConfig(PromptEncoderConfig): This is the configuration class to store the configuration of a [`CrossPromptEncoder`].
-        # num_tasks: -1
         encoder_input_size: null
-        encoder_init_state_dict_path: /fscratch/bmikaberidze/XPE/nlpka/models/storage/xlmr/FacebookAI|xlm-roberta-large/topic/10e025f6-1da6-44a4-9f96-b8893e65c2c5_FacebookAI|xlm-roberta-large_2021036_1_10_32_text_classification|topic|sib200_hf|source_xlmr_seen|tokenized|FacebookAI|xlm-roberta-large_source_xlmr_seen
+        encoder_init_state_dict_path: /fscratch/bmikaberidze/XPE/nlpka/models/storage/xlmr/FacebookAI|xlm-roberta-large/topic/ad56d282-e924-4026-b8fb-691721266098_FacebookAI|xlm-roberta-large_2021036_1_10_32_text_classification|topic|sib200_hf|source_xlmr_seen|tokenized|FacebookAI|xlm-roberta-large_source_xlmr_seen
         encoder_freeze: false
         encoder_embedding_freeze: false
         encoder_embedding_init_type: hf_default # hf_default | xavier_uniform | xavier_normal
         encoder_embedding_normalize: null # null | unit | clip
         encoder_embedding_normalize_max_norm: null
         # new xpe config >>
-        encoder_ratio: 0.3
+        encoder_ratio: 1
         # old ape config >>
         # encoder_embedding_type: FULLY_SHARED # FULLY_SHARED | PARTIALLY_DEDICATED | PARTIALLY_DEDICATED_DIM
         # encoder_embedding_dedicated_ratio: 0
@@ -66,7 +65,7 @@ tokenizer:
 ds:
     descriptive_name: null
     category: benchmarks # benchmarks | corpora | collections | raw
-    dirs: text_classification/topic/sib200_tokenized_xlmr # sib200_tokenized_xlmr | sib200_hf
+    dirs: text_classification/topic/sib200_hf/ace_Arab # sa/imdb_reviews_ka | sa/google_maps_reviews
     name: null
     type: huggingface_saved # text | csv | huggingface_saved | huggingface
     comes_with_splits: 

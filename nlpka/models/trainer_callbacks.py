@@ -7,7 +7,7 @@ import wandb
 import numpy as np
 from nlpka.models.peft import PEFT
 from nlpka.tools.enums import PretSourceSE
-from nlpka.models.adaptive_prompt_encoder import AdaptivePromptEncoder
+from nlpka.models.cross_prompt_encoder import CrossPromptEncoder
 from transformers import TrainerCallback, TrainingArguments, TrainerState, TrainerControl, EarlyStoppingCallback
 # from transformers.trainer_utils import get_last_checkpoint
 
@@ -132,9 +132,12 @@ class NormalizePromptEncoderEmbeddings(TrainerCallback):
         if model is None: return
         active_adapter = getattr(model, "active_adapter", None)
         if not hasattr(model, "prompt_encoder"): return
-        prompt_encoder = getattr(model.prompt_encoder, active_adapter, None)
+        if isinstance(model.prompt_encoder, torch.nn.ModuleDict) and active_adapter in model.prompt_encoder:
+            prompt_encoder = model.prompt_encoder[active_adapter]
+        else:
+            prompt_encoder = getattr(model.prompt_encoder, active_adapter, None)
         if not prompt_encoder: return
-        if isinstance(prompt_encoder, AdaptivePromptEncoder):
+        if isinstance(prompt_encoder, CrossPromptEncoder):
             mean_norm = prompt_encoder.normalize_embeddings()
             wandb.log({
                 "train/ape_embedd_norm": mean_norm

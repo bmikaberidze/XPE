@@ -4,36 +4,12 @@ common.info(__file__,__name__,__package__)
 import os
 import random
 import pandas as pd
+from peft import PeftType
 from types import SimpleNamespace
 from nlpka.models.model import MODEL
 from nlpka.configs.config import CONFIG
-from nlpka.tools.enums import ConfigTypeSE
-from nlpka.models.cross_prompt_encoder import (
-    is_cross_prompt_encoder,
-    get_cross_prompt_encoder
-)
+from nlpka.tools.enums import ConfigTypeSE, ModelArchSE
 from nlpka.models.cross_prompt_encoder import CrossPromptEncoderReparameterizationType as XPE_RE
-from peft import MultitaskPromptTuningInit, PeftType, set_peft_model_state_dict
-from nlpka.tools.enums import ModelArchSE
-
-source_ds_name = 'source'
-
-# Multi-SA
-multi_sa_ds_name_groups = [
-    ["thai_sa", "latvian_sa", "azerbaijani_sa", "slovak_sa", "bengali_sa", "macedonian_sa"], 
-    ["kurdish_sa", "telugu_sa", "marathi_sa", "bulgarian_sa", "uyghur_sa", "georgian_sa"],
-    ["sundanese_sa", "uzbek_sa", "amharic_sa", "igbo_sa", "swahili_sa", "yoruba_sa"], 
-    ["indonesian_sa", "javanese_sa", "nepali_sa", "sinhala_sa", "tibetan_sa", "maltese_sa"], 
-    ["greek_sa", "hebrew_sa", "romanian_sa", "danish_sa", "urdu_sa", "slovenian_sa", "welsh_sa"]
-]
-
-# XNLI
-xnli_ds_name_groups = [
-        # 'all_datasets',
-        ['ar', 'bg', 'de', 'el', 'en'], 
-        ['es', 'fr', 'hi', 'ru', 'sw'], 
-        ['th', 'tr', 'ur', 'vi']
-    ]
 
 import nlpka.datasets.storage as ds_stor
 ds_path = common.get_module_location(ds_stor)
@@ -161,10 +137,8 @@ xlmr_seen_family_groups_sib200_ds_names = [
 
 enarzho_sib200_ds_names = [ 'eng_Latn', 'arb_Arab', 'zho_Hans' ]
 
-def get_ds_names(benchmark_name = 'sib200_pres', llm = 'xlmr', target_id = 0):
-
-    if llm not in ['xlmr', 'aya', 'xglm']:
-        raise ValueError(f'Invalid llm: {llm}')
+source_ds_name = 'source'
+def get_ds_names(benchmark_name, llm):
 
     # EN ================================================
     if benchmark_name == 'sib200_en':
@@ -196,7 +170,10 @@ def get_ds_names(benchmark_name = 'sib200_pres', llm = 'xlmr', target_id = 0):
     if benchmark_name == 'sib200_joshi5_ablation':
         return f'{source_ds_name}_{llm}_joshi5', joshi5_sib200_ds_names, xlmr_25_seen_lrl_sib200_ds_names + xlmr_25_unseen_lrl_sib200_ds_names
     
-    if benchmark_name == 'sib200_joshi5_divers_ablation':
+    if benchmark_name in [
+        'sib200_joshi5_divers_ablation', 
+        'sib200_joshi5_divers_24'
+    ]:
         return f'{source_ds_name}_{llm}_joshi5', joshi5_sib200_ds_names, xlmr_24_divers_seen_sib200_ds_names + xlmr_24_divers_unseen_sib200_ds_names
     
     if benchmark_name == 'sib200_joshi5_divers_ablation_unseen':
@@ -241,16 +218,92 @@ def get_ds_names(benchmark_name = 'sib200_pres', llm = 'xlmr', target_id = 0):
     if benchmark_name == 'sib200_all':
         return f'{source_ds_name}_{llm}_all', sib200_ds_names, sib200_ds_names
     
-    # Multi-SA / XNLI ================================================
-    if benchmark_name in ['multi_sa', 'xnli']:
-        ds_name_groups = multi_sa_ds_name_groups if benchmark_name == 'multi_sa' else xnli_ds_name_groups
-        if target_id >= len(ds_name_groups):
-            raise ValueError(f'Invalid target_id: {target_id}')
-        target_ds_names = ds_name_groups[target_id]
-        source_ds_names = [ds_name for ds_names in ds_name_groups if ds_names != target_ds_names for ds_name in ds_names]
-        return f'{source_ds_name}_{llm}_{target_id}', source_ds_names, target_ds_names
-
     raise ValueError(f'Invalid benchmark_name: {benchmark_name}')
+
+# 
+# Get Configuration by SLURM Task
+# 
+
+def get_config_by_slurm_task(config_name, ds_name, supervision_regime):
+    source_model_uuid4 = None
+
+    s_job_id = int(os.getenv('SLURM_JOB_ID', 0))
+    s_task_id = int(os.getenv('SLURM_ARRAY_TASK_ID', 0))
+
+    config = CONFIG.load(config_name, ConfigTypeSE.LANGUAGE_MODEL)
+    s_task_conf_id = s_task_id
+
+    s_task_configs = {
+        # test run
+        0: (f'TEST', 20, 0, 2, None, 10, 32, 0.00005, 'adafactor', 24, XPE_RE.NONE, '', 0.005, 0.0, False),
+
+        # XLT run on enarzho, joshi5, and seen
+        1: (f'SPT', 20, 0, 2, None, 10, 32, 0.00005, 'adafactor', 24000, XPE_RE.NONE, '', 0.005, 0.0, False),
+        2: (f'D30', 20, 0.3, 2, None, 10, 32, 0.00005, 'adafactor', 24000, XPE_RE.MLP, '', 0.005, 0.0, False),
+        3: (f'D70', 20, 0.7, 2, None, 10, 32, 0.00005, 'adafactor', 24000, XPE_RE.MLP, '', 0.005, 0.0, False),
+        4: (f'XPE', 20, 1, 2, None, 10, 32, 0.00005, 'adafactor', 24000, XPE_RE.MLP, '', 0.005, 0.0, False),
+        
+        # LID over joshi5, and seen.
+        101: (f'LID_SPT_SEEN', 20, 0, 2, None, 5, 32, 0.00005, 'adafactor', 0, XPE_RE.NONE, '', 0, 0.0, True),
+        102: (f'LID_XPE_SEEN', 20, 1, 2, None, 5, 32, 0.00005, 'adafactor', 0, XPE_RE.MLP, '', 0, 0.0, True),
+        103: (f'LID_SPT_J5', 20, 0, 2, None, 5, 32, 0.00005, 'adafactor', 0, XPE_RE.NONE, '', 0, 0.0, True),
+        104: (f'LID_XPE_J5', 20, 1, 2, None, 5, 32, 0.00005, 'adafactor', 0, XPE_RE.MLP, '', 0, 0.0, True),
+    }
+
+    conf = s_task_configs[s_task_conf_id]
+
+    if supervision_regime:
+        s_task_conf_name = f'F_{conf[0]}'
+        config.test.zero_shot_only = False
+    else:
+        s_task_conf_name = f'Z_{conf[0]}'
+        config.test.zero_shot = True
+        config.test.zero_shot_only = True
+
+    config.task.peft.num_virtual_tokens = conf[1]
+    config.task.peft.encoder_ratio = conf[2]
+    config.task.peft.encoder_num_layers = conf[3]
+    config.task.peft.encoder_input_size = conf[4]
+    config.training_args.num_train_epochs = conf[5]
+    config.training_args.per_device_train_batch_size = conf[6]
+    config.training_args.learning_rate = conf[7]
+    lr_type = conf[8]
+    if lr_type == 'adafactor':
+        config.training_args.optim = lr_type
+        config.training_args.optim_args = SimpleNamespace(
+            beta1=None,
+            decay_rate=-0.8,
+            weight_decay=0.01,
+            clip_threshold=1.0,
+            scale_parameter=True,
+            relative_step=True,
+            warmup_init=True
+        )
+
+    max_steps = conf[9]
+    if max_steps: config.training_args.max_steps = max_steps
+
+    encoder_type = conf[10]
+    config.task.peft.encoder_reparameterization_type = encoder_type
+
+    if len(conf) > 11:
+        source_model_uuid4 = conf[11]
+    if len(conf) > 12:
+        spec_lr = conf[12]
+        if spec_lr:
+            config.custom_training_args.optimizer_grouped_parameters[0].lr = spec_lr
+        spec_wd = conf[13]
+        config.custom_training_args.optimizer_grouped_parameters[0].weight_decay = spec_wd
+        if encoder_type == XPE_RE.NONE or config.model.architecture == ModelArchSE.XGLM:
+            config.custom_training_args.optimizer_grouped_parameters[0].param_name_parts = ['embedding'] # concerns all prompt encoder embeddings
+        elif encoder_type == XPE_RE.MLP:
+            config.custom_training_args.optimizer_grouped_parameters[0].param_name_parts = ['xpe_embedding'] # concerns only dedicated embeddings
+    if len(conf) > 14:
+        config.task.peft.encoder_freeze = conf[14]
+
+    return config, s_task_conf_name, f'{s_job_id}_{s_task_id}', source_model_uuid4
+
+# 
 
 ds_base_dirs = ''
 def set_ds_dirs(config, name, suffix_dirs = None, subset_dirs = False):
@@ -262,128 +315,15 @@ def set_ds_dirs(config, name, suffix_dirs = None, subset_dirs = False):
     config.ds.dirs = f'{config.ds.dirs}/subset/{subset_dirs}' if subset_dirs else config.ds.dirs
     return config
 
-def get_config_by_slurm_task(config_name, ds_name):
-    source_model_uuid4 = None
-
-    target_id = None
-    s_job_id = int(os.getenv('SLURM_JOB_ID', 0))
-    s_task_id = int(os.getenv('SLURM_ARRAY_TASK_ID', 0))
-
-    if ds_name.startswith('sib200') or ds_name.startswith('lid200'):
-
-        if s_task_id > 0:
-            approach = 'xpe'
-        elif s_task_id == 0:
-            approach = 'mpt'
-        else:
-            approach = 'spt'
-
-        config_name = f'{config_name}.{approach}'
-        config = CONFIG.load(config_name, ConfigTypeSE.LANGUAGE_MODEL)
-        s_task_conf_id = s_task_id
-
-        if approach == 'xpe':
-            s_task_configs = {
-             
-                # LID over joshi5, and seen.
-                1: (f'SPT_SEEN', 20, 0, None, 2, None, 2, 32, 0.00005, 'adafactor', 0, XPE_RE.NONE, '', 0, 0.0, True, False),
-                2: (f'XPE_SEEN', 20, 1, None, 2, None, 2, 32, 0.00005, 'adafactor', 0, XPE_RE.MLP, '', 0, 0.0, True, False),
-                3: (f'SPT_J5', 20, 0, None, 2, None, 2, 32, 0.00005, 'adafactor', 0, XPE_RE.NONE, '', 0, 0.0, True, False),
-                4: (f'XPE_J5', 20, 1, None, 2, None, 2, 32, 0.00005, 'adafactor', 0, XPE_RE.MLP, '', 0, 0.0, True, False),
-
-            }
-
-            # Test
-            # CHECK! Model path env var I/O 
-            # Dedicated init variations and how it saves file
-            # LR variations
-            # <class 'torch.optim.adamw.AdamW'>
-            # {'lr': 5e-05, 'betas': (0.9, 0.999), 'eps': 1e-08}
-            
-            # <class 'transformers.optimization.Adafactor'>
-            # {'lr': 5e-05, 'scale_parameter': False, 'relative_step': False}
-
-            # print(f's_task_configs[s_task_conf_id]: {len(s_task_configs[s_task_conf_id])} {s_task_configs[s_task_conf_id]}')
-            # exit()
-
-            s_task_conf_name = f'{s_task_configs[s_task_conf_id][0]}'
-            config.task.peft.num_virtual_tokens = s_task_configs[s_task_conf_id][1]
-            config.task.peft.encoder_ratio = s_task_configs[s_task_conf_id][2]
-            # config.task.peft.encoder_embedding_dedicated_ratio = s_task_configs[s_task_conf_id][3]
-            config.task.peft.encoder_num_layers = s_task_configs[s_task_conf_id][4]
-            config.task.peft.encoder_input_size = s_task_configs[s_task_conf_id][5]
-            config.training_args.num_train_epochs = s_task_configs[s_task_conf_id][6]
-            config.training_args.per_device_train_batch_size = s_task_configs[s_task_conf_id][7]
-            config.training_args.learning_rate = s_task_configs[s_task_conf_id][8]
-            lr_type = s_task_configs[s_task_conf_id][9]
-            if lr_type == 'adafactor':
-                config.training_args.optim = lr_type
-                config.training_args.optim_args = SimpleNamespace(
-                    beta1=None,
-                    decay_rate=-0.8,
-                    weight_decay=0.01,
-                    clip_threshold=1.0,
-                    scale_parameter=True,
-                    relative_step=True,
-                    warmup_init=True
-                )
-
-            max_steps = s_task_configs[s_task_conf_id][10]
-            if max_steps: config.training_args.max_steps = max_steps
-
-            encoder_type = s_task_configs[s_task_conf_id][11]
-            config.task.peft.encoder_reparameterization_type = encoder_type
-
-            if len(s_task_configs[s_task_conf_id]) > 12:
-                source_model_uuid4 = s_task_configs[s_task_conf_id][12]
-            if len(s_task_configs[s_task_conf_id]) > 13:
-                spec_lr = s_task_configs[s_task_conf_id][13]
-                if spec_lr:
-                    config.custom_training_args.optimizer_grouped_parameters[0].lr = spec_lr
-                spec_wd = s_task_configs[s_task_conf_id][14]
-                config.custom_training_args.optimizer_grouped_parameters[0].weight_decay = spec_wd
-                if encoder_type == XPE_RE.NONE or config.model.architecture == ModelArchSE.XGLM:
-                    config.custom_training_args.optimizer_grouped_parameters[0].param_name_parts = ['embedding'] # concerns all prompt encoder embeddings
-                elif encoder_type == XPE_RE.MLP:
-                    config.custom_training_args.optimizer_grouped_parameters[0].param_name_parts = ['xpe_embedding'] # concerns only dedicated embeddings
-            if len(s_task_configs[s_task_conf_id]) > 15:
-                config.task.peft.encoder_freeze = s_task_configs[s_task_conf_id][15]
-            if len(s_task_configs[s_task_conf_id]) > 16:
-                config.test.zero_shot_only = s_task_configs[s_task_conf_id][16]
-
-        elif approach in ['mpt', 'spt']:
-            s_task_conf_name = f'{approach}'
-
-        else:
-            raise ValueError(f'Invalid approach: {approach}')
-
-    else:
-        target_num = len(xnli_ds_name_groups) if ds_name == 'xnli' else len(multi_sa_ds_name_groups) 
-        approach = 'mpt' if s_task_id < target_num else 'xpe'
-        config_name = f'{config_name}.{approach}'
-        config = CONFIG.load(config_name, ConfigTypeSE.LANGUAGE_MODEL)
-
-        s_task_conf_id = s_task_id
-        if approach == 'xpe':
-            s_task_conf_id -= target_num
-
-        s_task_conf_name = f'target_{s_task_conf_id}'
-        target_id = s_task_conf_id
-
-        common.p(config.task)
-        exit()
-
-    return config, config_name, approach, target_id, s_task_conf_name, f'{s_job_id}_{s_task_id}', source_model_uuid4
-
 encoder_freeze = None
 num_train_epochs = 0
 max_steps = 0
 zero_shot_only = None
 zero_shot = None
 batch_size = 0
-def update_config(config, ds_name, task_id, num_tasks = 1, task_keys = None, suffix_dirs = None, 
-                  preproc_subset_ratio = None, subset_dirs = False, source_model_uuid4 = None, source_training = False,
-                  dedicated_init = None, dedicated_init_key = None):
+def update_config(config, ds_name, task_id, suffix_dirs = None, 
+                  preproc_subset_ratio = None, subset_dirs = False, 
+                  source_model_uuid4 = None, source_training = False):
     
     config = set_ds_dirs(config, ds_name, suffix_dirs, subset_dirs)
     if preproc_subset_ratio:
@@ -391,9 +331,6 @@ def update_config(config, ds_name, task_id, num_tasks = 1, task_keys = None, suf
 
     # Tasks
     config.task.id = task_id
-    if 'peft' in vars(config.task) and is_cross_prompt_encoder(config.task.peft):
-        config.task.peft.num_tasks = num_tasks
-        config.task.peft.task_keys = task_keys
             
     # Target Preparations
     if getattr(config.task, 'peft', None):
@@ -417,24 +354,19 @@ def update_config(config, ds_name, task_id, num_tasks = 1, task_keys = None, suf
             config.task.peft.encoder_freeze = encoder_freeze
             config.custom_training_args.early_stopping_patience = 30
             config.training_args.per_device_train_batch_size = batch_size
-            
-            if max_steps:
-                config.training_args.max_steps = int(max_steps/4)
-            else:
-                config.training_args.num_train_epochs = num_train_epochs * 5
 
             config.training_args.warmup_ratio = 0.05
             config.training_args.weight_decay = 0.01
             config.training_args.max_grad_norm = 1.0
 
-            source_model_path = MODEL.get_last_checkpoint_path_by_uuid4(source_model_uuid4)
+            if max_steps:
+                config.training_args.max_steps = int(max_steps/4)
+            else:
+                config.training_args.num_train_epochs = num_train_epochs * 5
+
             if config.task.peft.peft_type == PeftType.P_TUNING:
                 config.task.peft.encoder_dropout = 0.0
-                config.task.peft.encoder_init_state_dict_path = source_model_path
-
-            elif config.task.peft.peft_type == PeftType.MULTITASK_PROMPT_TUNING:
-                config.task.peft.prompt_tuning_init = MultitaskPromptTuningInit.AVERAGE_SOURCE_TASKS
-                config.task.peft.prompt_tuning_init_state_dict_path = f'{source_model_path}/adapter_model.safetensors'
+                config.task.peft.encoder_init_state_dict_path = MODEL.get_last_checkpoint_path_by_uuid4(source_model_uuid4)
         
         elif source_training:
             
@@ -446,21 +378,17 @@ def update_config(config, ds_name, task_id, num_tasks = 1, task_keys = None, suf
             config.custom_training_args.early_stopping_patience = 20
             config.training_args.per_device_train_batch_size = 32
 
+            config.training_args.warmup_ratio = 0.1
+            config.training_args.weight_decay = 0.01
+            config.training_args.max_grad_norm = 1.0
+
             if max_steps:
                 config.training_args.max_steps = max_steps
             else:
                 config.training_args.num_train_epochs = num_train_epochs
 
-            config.training_args.warmup_ratio = 0.1
-            config.training_args.weight_decay = 0.01
-            config.training_args.max_grad_norm = 1.0
-
-            source_model_path = None
             if config.task.peft.peft_type == PeftType.P_TUNING:
                 config.task.peft.encoder_dropout = 0.1
-                config.task.peft.encoder_init_state_dict_path = source_model_path
+                config.task.peft.encoder_init_state_dict_path = None
 
-            elif config.task.peft.peft_type == PeftType.MULTITASK_PROMPT_TUNING:
-                config.task.peft.prompt_tuning_init = None
-                config.task.peft.prompt_tuning_init_state_dict_path = source_model_path
     return config

@@ -886,8 +886,8 @@ class MODEL:
         if 'pret_path' in self.__dict__:
             print(f' - Pretrained Path: {self.pret_path}')
         print(f' - Arch: {self._config.model.architecture}')
-        print(f' - Uuid4: {self.uuid4}')
-        print(f' - Name: {self.name}')
+        print(f' - Uuid4: {self.uuid4 if hasattr(self, "uuid4") else "None"}')
+        print(f' - Name: {self.name if hasattr(self, "name") else "None"}')
         print(f' - Class: {type(self._model).__name__}')
         base_model = self.get_base_model(self._model)
         print(f' - Base Model Class: {type(base_model).__name__}')
@@ -910,12 +910,6 @@ class MODEL:
         print(f' - Available Device: {self.device}')
         print(f' - CUDA_VISIBLE_DEVICES: {os.getenv("CUDA_VISIBLE_DEVICES")}')
         print(f' - MASTER_PORT: {os.getenv("MASTER_PORT")}')
-        print(f' - Place Model on Device: {self.trainer.place_model_on_device}') # **place_model_on_device** -- Whether or not to automatically place the model on the device - it will be set to `False` if model parallel or deepspeed is used, or if the default `TrainingArguments.place_model_on_device` is overridden to return `False` .
-        print(f' - Data Parralelism: {self.trainer.args.parallel_mode}')
-        print(f' - ZeRO: {self.trainer.is_deepspeed_enabled}')
-        print(f' - FSDP: {self.trainer.is_fsdp_enabled}')
-        print(f' - FSDP_XLA: {self.trainer.is_fsdp_xla_enabled}')
-        print(f' - Model Parralelism: {self.trainer.is_model_parallel}')
 
         print(f' - RANK: {os.getenv("RANK")}')
         print(f' - LOCAL_RANK: {os.getenv("LOCAL_RANK")}')
@@ -931,12 +925,22 @@ class MODEL:
         print(f' - NCCL_CUDA_PATH: {os.getenv("NCCL_CUDA_PATH")}')
         print(f' - LD_LIBRARY_PATH: {os.getenv("LD_LIBRARY_PATH")}')
         
-        print(f' - Distributed State: {self.trainer.args.distributed_state}')
         
-        print('\nBatch Details >')
-        self.print_batch_examples(DsSplitSE.TRAIN)
-        self.print_batch_examples(DsSplitSE.VALIDATION, 1)
-        self.print_batch_examples(DsSplitSE.TEST, 1)
+        if  hasattr(self, "trainer"):
+            print('\nTrainer Details >')
+            print(f' - Distributed State: {self.trainer.args.distributed_state}')
+
+            print(f' - Place Model on Device: {self.trainer.place_model_on_device}') # **place_model_on_device** -- Whether or not to automatically place the model on the device - it will be set to `False` if model parallel or deepspeed is used, or if the default `TrainingArguments.place_model_on_device` is overridden to return `False` .
+            print(f' - Data Parralelism: {self.trainer.args.parallel_mode}')
+            print(f' - ZeRO: {self.trainer.is_deepspeed_enabled}')
+            print(f' - FSDP: {self.trainer.is_fsdp_enabled}')
+            print(f' - FSDP_XLA: {self.trainer.is_fsdp_xla_enabled}')
+            print(f' - Model Parralelism: {self.trainer.is_model_parallel}')
+
+            print('\nBatch Details >')
+            self.print_batch_examples(DsSplitSE.TRAIN)
+            self.print_batch_examples(DsSplitSE.VALIDATION, 1)
+            self.print_batch_examples(DsSplitSE.TEST, 1)
 
         common.p(f'\n[green][bold]Model is ready for {self._config.mode}![/bold][/green]\n')
         # exit()
