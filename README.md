@@ -19,10 +19,11 @@ across both CPU-only and NVIDIA GPU environments.
 
 **Contents**  
 - [Setup](#setup)  
-- [Usage](#usage)  
+- [Usage](#usage)
+- [Artifacts](#artifacts) 
+- [Reproducibility Notes](#reproducibility-notes)
 - [Cite](#cite)  
 - [Contact](#contact)
-
 
 ---
 
@@ -159,9 +160,9 @@ Hugging Face to support reproducibility and further analysis:
 
 ---
 
-## Reproducibility
+## Reproducibility Notes
 
-- Experiments were run inside a Docker container based on an official PyTorch runtime image.
+- Experiments were run inside a Docker container based on an official PyTorch image.
 - The same container supports **CPU-only** and **NVIDIA GPU** execution.
 - GPU usage is enabled by running Docker with `--gpus all`; **full training is intended for GPU**.
 - CPU runs are supported but are meant for debugging or small-scale sanity checks.
