@@ -1,6 +1,6 @@
 tqdm
 nltk
-peft==0.14.0 # 0.15.0 (STABLE)
+peft==0.14.0
 rich
 wandb
 numpy

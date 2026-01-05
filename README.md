@@ -1,14 +1,34 @@
 # Cross-Prompt Encoder for Low-Performing Languages
 
-This repository contains the code and experiments for the **Cross-Prompt Encoder (XPE)**, as described in our Findings of AACL 2025 preprint:  
-**“Cross-Prompt Encoder for Low-Performing Languages”** ([arXiv:2508.10352](https://arxiv.org/abs/2508.10352)).  
-The project focuses on cross-lingual transfer learning using parameter-efficient prompt-based methods.
+This repository contains the **code and experimental setup** for our paper accepted at *Findings of IJCNLP–AACL 2025*:  
+📄 Preprint: [arXiv:2508.10352](https://arxiv.org/abs/2508.10352)
 
-The recommended and **canonical way** to run the code is via **Docker**, which ensures reproducibility across CPU and GPU environments.
+**Authors**  
+Beso Mikaberidze†, Teimuraz Saghinadze†, Simon Ostermann\*+, Philipp Müller\*°
+
+† Muskhelishvili Institute of Computational Mathematics, GTU (MICM)  
+\* Deutsches Forschungszentrum für Künstliche Intelligenz (DFKI)  
+\+ Center for European Research in Trusted AI (CERTAIN)  
+° Max Planck Institute for Intelligent Systems
+
+The paper studies **cross-lingual transfer learning** for low-performing languages using **parameter-efficient prompt-based methods**.
+It presents an empirical study showing that a prompt-encoder with multi-source training improves transfer on low-performing languages in SIB-200, while a hybrid approach with a standard soft prompt broadens applicability.
+
+The recommended and canonical way to run the code is via **Docker**, which ensures reproducibility
+across both CPU-only and NVIDIA GPU environments.
+
+**Contents**  
+- [Setup](#setup)  
+- [Usage](#usage)  
+- [Cite](#cite)  
+- [Contact](#contact)
+
 
 ---
 
-## 1. Clone the repository
+## Setup
+
+### Clone the repository
 
 ```bash
 git clone https://github.com/bmikaberidze/XPE.git
@@ -17,7 +37,7 @@ cd XPE
 
 ---
 
-## 2. Environment variables
+### Environment variables
 
 Copy the example environment file:
 
@@ -35,7 +55,7 @@ Set your Weights & Biases API key:
 
 ---
 
-## 3. Local Python environment (Optional)
+### Local Python environment (Optional)
 
 > ⚠️ Local installation is **not guaranteed** to work on all platforms.
 > The Docker setup below is the **officially supported** environment.
@@ -48,15 +68,15 @@ pip install -r requirements.txt
 
 ---
 
-## 4. Docker-based setup (recommended)
+### Docker-based setup (recommended)
 
-### Build the Docker image
+#### Build the Docker image
 
 ```bash
 docker build -t xpe .
 ```
 
-### Run an interactive container (CPU)
+#### Run an interactive container (CPU)
 
 ```bash
 docker run -it --rm \
@@ -66,7 +86,7 @@ docker run -it --rm \
   bash
 ```
 
-### Run with NVIDIA GPU support
+#### Run with NVIDIA GPU support
 
 Requires:
 - NVIDIA GPU
@@ -85,9 +105,11 @@ Inside the container, your project files are available at `/xpe_runner`.
 
 ---
 
-## 5. Dataset preparation
+## Usage
 
-Download and preprocess the SIB-200 dataset:
+### Dataset preparation
+
+Download preprocessed SIB-200 dataset:
 
 ```bash
 python -m nlpka.datasets.scripts.sib200.download_tokenized
@@ -95,9 +117,9 @@ python -m nlpka.datasets.scripts.sib200.download_tokenized
 
 ---
 
-## 6. Running experiments
+### Running experiments
 
-Use the same entrypoint, changing only `--supervision_regime` and the trailing arguments:
+Use the same entrypoint, changing only `--supervision_regime` and the trailing arguments that specify the source dataset and methodology type:
 
 ```bash
 python -m nlpka.models.scripts.peft.xpe.run \
@@ -119,7 +141,7 @@ python -m nlpka.models.scripts.peft.xpe.run \
 
 ---
 
-## 7. Notes on reproducibility
+### Notes on reproducibility
 
 - Experiments were run inside a Docker container based on an official PyTorch runtime image.
 - The same container supports **CPU-only** and **NVIDIA GPU** execution.
@@ -128,7 +150,7 @@ python -m nlpka.models.scripts.peft.xpe.run \
 
 ---
 
-## 8. Citation
+## Cite
 
 If you use this code, please cite:
 
@@ -146,3 +168,12 @@ BibTeX:
   url           = {https://arxiv.org/abs/2508.10352},
 }
 ```
+
+---
+
+## Contact
+- besik.mikaberidze@dfki.de
+- beso.mikaberidze@gmail.com
+- mueller@is.mpg.de
+
+Feel free to reach out with questions, issues running the code, or requests for clarifications about the experiments.

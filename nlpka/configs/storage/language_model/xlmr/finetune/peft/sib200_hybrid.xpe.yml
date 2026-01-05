@@ -47,8 +47,10 @@ task:
 model:
     architecture: xlmr # bert | roberta | xlnet | electra | xlm
     pretrained:
-        name: FacebookAI|xlm-roberta-large
-        source: local # null | local | huggingface
+        # name: FacebookAI|xlm-roberta-large
+        # source: local # null | local | huggingface
+        name: FacebookAI/xlm-roberta-large
+        source: huggingface
         checkpoint: null
         # adapter:
         #     name: null

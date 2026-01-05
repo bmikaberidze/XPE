@@ -4,12 +4,12 @@ Run Source Pre-Training and Target Fine-Tuning for Cross Prompt Encoder (XPE)
 Usage:
     --
     # Zero-Shot XLT
-    runtime/clusters/pegasus/shell/run.sh  "python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_enarzho" # 1-4
-    runtime/clusters/pegasus/shell/run.sh  "python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_joshi5" # 1-4
-    runtime/clusters/pegasus/shell/run.sh  "python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_xlmr_seen" # 1-4
+    python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_enarzho # 1-4
+    python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_joshi5 # 1-4
+    python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=0 sib200_xlmr_seen # 1-4
 
     # Full-Shot XLT
-    runtime/clusters/pegasus/shell/run.sh  "python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=1 sib200_joshi5_divers_24" # 1-4
+    python -m nlpka.models.scripts.peft.xpe.run --config xlmr/finetune/peft/sib200_hybrid.xpe --supervision_regime=1 sib200_joshi5_divers_24 # 1-4
     --
     squeue -u bmikaberidze --long
     scancel
