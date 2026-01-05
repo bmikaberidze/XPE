@@ -109,7 +109,7 @@ Inside the container, your project files are available at `/xpe_runner`.
 
 ### Dataset preparation
 
-Download preprocessed SIB-200 dataset:
+Download the XLM-R–tokenized SIB-200 dataset:
 
 ```bash
 python -m nlpka.datasets.scripts.sib200.download_tokenized
@@ -141,7 +141,25 @@ python -m nlpka.models.scripts.peft.xpe.run \
 
 ---
 
-### Notes on reproducibility
+## Artifacts
+
+In addition to the code in this repository, we release the following research artifacts on
+Hugging Face to support reproducibility and further analysis:
+
+- **SIB-200 (XLM-R tokenized)**  
+  Preprocessed and XLM-R–tokenized version of SIB-200 used in experiments.  
+  Dataset: [mikaberidze/sib200_tokenized_xlmr](https://huggingface.co/datasets/mikaberidze/sib200_tokenized_xlmr)
+
+- **LID-200 (derived from SIB-200)**  
+  Language identification dataset constructed from SIB-200 and used for auxiliary LID experiments.  
+  Dataset: [mikaberidze/lid200](https://huggingface.co/datasets/mikaberidze/lid200)
+
+- **Trained soft prompts and prompt encoders**  
+  Models will be made publicly available on Hugging Face.
+
+---
+
+## Reproducibility
 
 - Experiments were run inside a Docker container based on an official PyTorch runtime image.
 - The same container supports **CPU-only** and **NVIDIA GPU** execution.
