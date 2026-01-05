@@ -1,9 +1,9 @@
 # Cross-Prompt Encoder for Low-Performing Languages
 
-This repository contains the **code and experimental setup** for our paper accepted at *Findings of IJCNLP–AACL 2025*:  
-📄 Preprint: [arXiv:2508.10352](https://arxiv.org/abs/2508.10352)
+This repository contains the **code and experimental setup** for our paper accepted at  
+*Findings of IJCNLP–AACL 2025*, with a preprint available on [arXiv:2508.10352](https://arxiv.org/abs/2508.10352).
 
-**Authors**  
+**Authors:**  
 Beso Mikaberidze†, Teimuraz Saghinadze†, Simon Ostermann\*+, Philipp Müller\*°
 
 † Muskhelishvili Institute of Computational Mathematics, GTU (MICM)  
@@ -17,13 +17,8 @@ It presents an empirical study showing that a prompt-encoder with multi-source t
 The recommended and canonical way to run the code is via **Docker**, which ensures reproducibility
 across both CPU-only and NVIDIA GPU environments.
 
-**Contents**  
-- [Setup](#setup)  
-- [Usage](#usage)
-- [Artifacts](#artifacts) 
-- [Reproducibility Notes](#reproducibility-notes)
-- [Cite](#cite)  
-- [Contact](#contact)
+**Contents:**  
+[Setup](#setup) | [Usage](#usage) | [Artifacts](#artifacts) | [Reproducibility Notes](#reproducibility-notes) | [Cite](#cite)  | [Contact](#contact)
 
 ---
 
@@ -35,8 +30,6 @@ across both CPU-only and NVIDIA GPU environments.
 git clone https://github.com/bmikaberidze/XPE.git
 cd XPE
 ```
-
----
 
 ### Environment variables
 
@@ -54,8 +47,6 @@ Set your Weights & Biases API key:
    WANDB_API_KEY=your_key_here
    ```
 
----
-
 ### Local Python environment (Optional)
 
 > ⚠️ Local installation is **not guaranteed** to work on all platforms.
@@ -66,8 +57,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
-
----
 
 ### Docker-based setup (recommended)
 
@@ -110,35 +99,43 @@ Inside the container, your project files are available at `/xpe_runner`.
 
 ### Dataset preparation
 
-Download the XLM-R–tokenized SIB-200 dataset:
+Download the XLM-R–tokenized SIB-200 dataset (no auth required); it will be stored at:
+`./nlpka/datasets/storage/benchmarks/text_classification/topic/sib200_tokenized_xlmr`
 
 ```bash
 python -m nlpka.datasets.scripts.sib200.download_tokenized
 ```
 
----
-
 ### Running experiments
 
-Use the same entrypoint, changing only `--supervision_regime` and the trailing arguments that specify the source dataset and methodology type:
+All experiments are run via a single entrypoint.  
+Change only `--supervision_regime` and the trailing arguments that specify the source dataset and methodology type:
 
 ```bash
 python -m nlpka.models.scripts.peft.xpe.run \
    --config xlmr/finetune/peft/sib200_hybrid.xpe \
-   --supervision_regime=<0|1> <dataset_arg> <setup_id>
+   --supervision_regime=<0|1> <source_dataset> <setup_id>
 ```
 
-- `--supervision_regime=0` (Zero-Shot XLT):
-  - `<dataset_arg>`: one of `sib200_enarzho`, `sib200_joshi5`, `sib200_xlmr_seen` (source dataset names).
-  - `<setup_id>`: choose one of:
-    - `1` = SPT: standard soft prompt.
-    - `2` = D30: dual approach with 30% XPE.
-    - `3` = D70: dual approach with 70% XPE.
-    - `4` = XPE: full Cross-Prompt Encoder.
+- `--supervision_regime`:
+  - `0` → Zero-Shot XLT
+  - `1` → Fully Supervised XLT
+- `<source_dataset>`:
+  - `sib200_enarzho`, `sib200_joshi5`, `sib200_xlmr_seen` (used in Zero-Shot XLT)
+  - `sib200_joshi5_divers_24` (used in Fully Supervised XLT).
+- `<setup_id>`:
+  - `1` → SPT (Standard Soft Prompt)
+  - `2` → D30 (DUAL, 30% XPE)
+  - `3` → D70 (DUAL, 70% XPE)
+  - `4` → XPE (Cross-Prompt Encoder)
 
-- `--supervision_regime=1` (Fully Supervised XLT):
-  - `<dataset_arg>`: use `sib200_joshi5_divers_24`.
-  - `<setup_id>`: required; choose 1–4 as above (same meaning).
+Example (Zero-Shot XLT with XLM-R seen source languages and XPE):
+
+```bash
+python -m nlpka.models.scripts.peft.xpe.run \
+  --config xlmr/finetune/peft/sib200_hybrid.xpe \
+  --supervision_regime=0 sib200_xlmr_seen 4
+```
 
 ---
 
@@ -156,7 +153,7 @@ Hugging Face to support reproducibility and further analysis:
   Dataset: [mikaberidze/lid200](https://huggingface.co/datasets/mikaberidze/lid200)
 
 - **Trained soft prompts and prompt encoders**  
-  Models will be made publicly available on Hugging Face.
+  Models will be made publicly available on Hugging Face (coming soon).
 
 ---
 
