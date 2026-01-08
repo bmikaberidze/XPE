@@ -58,7 +58,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Docker-based setup (recommended)
+### Docker-based setup (Recommended)
 
 #### Build the Docker image
 
