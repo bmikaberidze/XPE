@@ -101,8 +101,8 @@ def get_cross_prompt_encoder(base_model, peft_config_vars):
     common.monkey_patch_globally("get_peft_model_state_dict", xpe_get_peft_model_state_dict)
     common.monkey_patch_globally("set_peft_model_state_dict", xpe_set_peft_model_state_dict)
     # print('peft_model', peft_model, flush=True)
-    # if peft_config.encoder_init_state_dict_path:
-    #     peft_model = maybe_load_pretrained_classifier_state(peft_model, peft_config.encoder_init_state_dict_path)
+    if peft_config.encoder_init_state_dict_path:
+        peft_model = maybe_load_pretrained_classifier_state(peft_model, peft_config.encoder_init_state_dict_path)
     return peft_model
 
 def _setup_prompt_encoder(self, adapter_name: str):

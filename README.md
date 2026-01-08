@@ -1,7 +1,7 @@
 # Cross-Prompt Encoder for Low-Performing Languages
 
 This repository contains the **code and experimental setup** for our paper accepted at  
-*Findings of IJCNLP–AACL 2025*, with a preprint available on [arXiv:2508.10352](https://arxiv.org/abs/2508.10352).
+*Findings of IJCNLP–AACL 2025*, with a preprint available on [`arXiv:2508.10352`](https://arxiv.org/abs/2508.10352).
 
 **Authors:**  
 Beso Mikaberidze†, Teimuraz Saghinadze†, Simon Ostermann\*+, Philipp Müller\*°
@@ -129,7 +129,7 @@ python -m nlpka.models.scripts.peft.xpe.run \
   - `3` → D70 (DUAL, 70% XPE)
   - `4` → XPE (Cross-Prompt Encoder)
 
-Example (Zero-Shot XLT with XLM-R seen source languages and XPE):
+Example - Zero-Shot XLT with XLM-R seen source languages and XPE:
 
 ```bash
 python -m nlpka.models.scripts.peft.xpe.run \
@@ -146,14 +146,19 @@ Hugging Face to support reproducibility and further analysis:
 
 - **SIB-200 (XLM-R tokenized)**  
   Preprocessed and XLM-R–tokenized version of SIB-200 used in experiments.  
-  Dataset: [mikaberidze/sib200_tokenized_xlmr](https://huggingface.co/datasets/mikaberidze/sib200_tokenized_xlmr)
+  Dataset: [`mikaberidze/sib200_tokenized_xlmr`](https://huggingface.co/datasets/mikaberidze/sib200_tokenized_xlmr)
 
 - **LID-200 (derived from SIB-200)**  
   Language identification dataset constructed from SIB-200 and used for auxiliary LID experiments.  
-  Dataset: [mikaberidze/lid200](https://huggingface.co/datasets/mikaberidze/lid200)
+  Dataset: [`mikaberidze/lid200`](https://huggingface.co/datasets/mikaberidze/lid200)
 
-- **Trained soft prompts and prompt encoders**  
-  Models will be made publicly available on Hugging Face (coming soon).
+- **Trained PEFT Models**  
+XPE / SPT adapters for XLM-R (large), trained on different source-language groups from SIB-200.
+    - [`mikaberidze/xlmr-large-sib200-peft-xpe-seen`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-xpe-seen)
+    - [`mikaberidze/xlmr-large-sib200-peft-spt-seen`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-spt-seen)
+    - [`mikaberidze/xlmr-large-sib200-peft-xpe-joshi5`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-xpe-joshi5)
+    - [`mikaberidze/xlmr-large-sib200-peft-spt-joshi5`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-spt-joshi5)
+
 
 ---
 
@@ -189,8 +194,8 @@ BibTeX:
 ---
 
 ## Contact
-- besik.mikaberidze@dfki.de
-- beso.mikaberidze@gmail.com
-- mueller@is.mpg.de
+- `besik.mikaberidze@dfki.de`
+- `beso.mikaberidze@gmail.com`
+- `mueller@is.mpg.de`
 
 Feel free to reach out with questions, issues running the code, or requests for clarifications about the experiments.

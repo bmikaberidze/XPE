@@ -26,4 +26,6 @@ nlpka/tokenizers/storage/
 nlpka/models/storage/
 nlpka/evaluations/storage/
 
+runtime/
+
 Polyglot_Prompt/
