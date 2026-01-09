@@ -18,7 +18,7 @@ The recommended and canonical way to run the code is via **Docker**, which ensur
 across both CPU-only and NVIDIA GPU environments.
 
 **Contents:**  
-[Setup](#setup) | [Usage](#usage) | [Artifacts](#artifacts) | [Reproducibility Notes](#reproducibility-notes) | [Cite](#cite)  | [Contact](#contact)
+[Setup](#setup) | [Usage](#usage) | [Artifacts](#artifacts) | [Reproducibility Notes](#reproducibility-notes) | [Acknowledgements](#acknowledgements) | [Cite](#cite)  | [Contact](#contact)
 
 ---
 
@@ -164,11 +164,16 @@ XPE / SPT adapters for XLM-R (large), trained on different source-language group
 
 ## Reproducibility Notes
 
-- Experiments were run inside a Docker container based on an official PyTorch image.
 - The same container supports **CPU-only** and **NVIDIA GPU** execution.
 - GPU usage is enabled by running Docker with `--gpus all`; **full training is intended for GPU**.
 - CPU runs are supported but are meant for debugging or small-scale sanity checks.
 - No support is provided for non-NVIDIA GPUs.
+
+---
+
+## Acknowledgements
+
+This work was partially supported by the European Union under Horizon Europe project "GAIN" (GA #101078950) and by the German Federal Ministry of Research, Technology and Space (BMFTR) as part of the project TRAILS (01IW24005).
 
 ---
 
@@ -194,8 +199,9 @@ BibTeX:
 ---
 
 ## Contact
+
+Feel free to reach out with questions, issues running the code, or requests for clarifications about the experiments.  
 - `besik.mikaberidze@dfki.de`
 - `beso.mikaberidze@gmail.com`
 - `mueller@is.mpg.de`
 
-Feel free to reach out with questions, issues running the code, or requests for clarifications about the experiments.
