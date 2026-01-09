@@ -22,7 +22,7 @@ ds_stor_path = common.get_module_location(ds_stor)
 # -----------------------------
 # Config
 # -----------------------------
-REPO_ID = "mikaberidze/sib200_tokenized_xlmr"
+REPO_ID = "mikaberidze/sib200-xlmr-tokenized"
 PRIVATE = False
 
 # Read existing configs on the Hub to avoid re-uploading

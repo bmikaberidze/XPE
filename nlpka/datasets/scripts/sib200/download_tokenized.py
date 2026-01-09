@@ -13,7 +13,7 @@ import nlpka.datasets.storage as ds_stor
 ds_stor_path = common.get_module_location(ds_stor)
 
 # Define the dataset name and the local save path
-dataset_name = "mikaberidze/sib200_tokenized_xlmr"
+dataset_name = "mikaberidze/sib200-xlmr-tokenized"
 save_path = f"{ds_stor_path}/benchmarks/text_classification/topic/sib200_tokenized_xlmr"
 os.makedirs(save_path, exist_ok=True)
 

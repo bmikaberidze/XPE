@@ -135,7 +135,7 @@ This model is released as part of the paper:
 *Findings of IJCNLP–AACL 2025*; preprint at [arXiv:2508.10352](https://arxiv.org/abs/2508.10352).
 
 The paper studies cross-lingual transfer learning for low-performing languages using
-parameter-efficient, prompt-based methods on the **SIB-200** benchmark.
+parameter-efficient, prompt-based methods on the SIB-200 benchmark.
 
 This repository provides the trained **{method_title}** adapter used in the study.
 It is a parameter-efficient soft-prompt model designed to be loaded on top of a
@@ -175,7 +175,7 @@ intended to be loaded and used via the canonical
 - **Research Paper:** [`Cross-Prompt Encoder for Low-Performing Languages`](https://arxiv.org/abs/2508.10352)  
 - **Code Repository:** [`bmikaberidze/XPE`](https://github.com/bmikaberidze/XPE)  
 - **Benchmark:** [`Davlan/sib200`](https://huggingface.co/datasets/Davlan/sib200)  
-- **Preprocessed Dataset:** [`mikaberidze/sib200_tokenized_xlmr`](https://huggingface.co/datasets/mikaberidze/sib200_tokenized_xlmr)
+- **Preprocessed Dataset:** [`mikaberidze/sib200-xlmr-tokenized`](https://huggingface.co/datasets/mikaberidze/sib200-xlmr-tokenized)
 - **Related Models:** 
     - [`mikaberidze/xlmr-large-sib200-peft-xpe-seen`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-xpe-seen)
     - [`mikaberidze/xlmr-large-sib200-peft-spt-seen`](https://huggingface.co/mikaberidze/xlmr-large-sib200-peft-spt-seen)

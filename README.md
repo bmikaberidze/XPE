@@ -146,7 +146,7 @@ Hugging Face to support reproducibility and further analysis:
 
 - **SIB-200 (XLM-R tokenized)**  
   Preprocessed and XLM-R–tokenized version of SIB-200 used in experiments.  
-  Dataset: [`mikaberidze/sib200_tokenized_xlmr`](https://huggingface.co/datasets/mikaberidze/sib200_tokenized_xlmr)
+  Dataset: [`mikaberidze/sib200-xlmr-tokenized`](https://huggingface.co/datasets/mikaberidze/sib200-xlmr-tokenized)
 
 - **LID-200 (derived from SIB-200)**  
   Language identification dataset constructed from SIB-200 and used for auxiliary LID experiments.  
