@@ -151,28 +151,28 @@ frozen XLM-R (large) backbone, and contains the learned:
 - **Adaptation:** Parameter-Efficient Fine-Tuning (PEFT), {method_title}  
 - **Backbone:** [`FacebookAI/xlm-roberta-large`](https://huggingface.co/FacebookAI/xlm-roberta-large)  
 - **Task:** Multilingual Topic Classification  
-- **Training Regime:** Zero-Shot Cross-Lingual Transfer  
-- **Source Language Group:** {source_language_group}  
 - **Benchmark:** [`Davlan/sib200`](https://huggingface.co/datasets/Davlan/sib200)  
+- **Source Language Group:** {source_language_group}  
 
 ### Seeds
 
-The **`main`** branch corresponds to **`seed-01`**  
-Additional random seeds are available as branches: **`seed-02`**, **`seed-03`**, …, **`seed-10`**
+This repository includes 10 models trained with different random seeds.  
+The **`main`** branch corresponds to **`seed-01`**   
+Models for other seeds are available as branches: **`seed-02`**, **`seed-03`**, …, **`seed-10`**  
 
 ---
 
 ## Usage
 
 
-This model is part of the experimental framework introduced in the paper and is
-intended to be loaded and used via the canonical
+This model is part of the experimental framework introduced in the [paper](https://arxiv.org/abs/2508.10352) and is
+intended to be loaded and used via its canonical
 [codebase](https://github.com/bmikaberidze/XPE). 
 
 ---
 
 ## Related Resources
-- **Research Paper:** [`Cross-Prompt Encoder for Low-Performing Languages`](https://arxiv.org/abs/2508.10352)  
+- **Paper Preprint:** [`Cross-Prompt Encoder for Low-Performing Languages`](https://arxiv.org/abs/2508.10352)  
 - **Code Repository:** [`bmikaberidze/XPE`](https://github.com/bmikaberidze/XPE)  
 - **Benchmark:** [`Davlan/sib200`](https://huggingface.co/datasets/Davlan/sib200)  
 - **Preprocessed Dataset:** [`mikaberidze/sib200-xlmr-tokenized`](https://huggingface.co/datasets/mikaberidze/sib200-xlmr-tokenized)
