@@ -1,5 +1,7 @@
 # Cross-Prompt Encoder for Low-Performing Languages
 
+[Setup](#setup) | [Usage](#usage) | [Artifacts](#artifacts) | [Reproducibility Notes](#reproducibility-notes) | [Acknowledgements](#acknowledgements) | [Cite](#cite)  | [Contact](#contact)
+
 This repository contains the **code and experimental setup** for our paper accepted at  
 *Findings of IJCNLP–AACL 2025*, with a preprint available on [`arXiv:2508.10352`](https://arxiv.org/abs/2508.10352).
 
@@ -16,9 +18,6 @@ It presents an empirical study showing that a prompt-encoder with multi-source t
 
 The recommended and canonical way to run the code is via **Docker**, which ensures reproducibility
 across both CPU-only and NVIDIA GPU environments.
-
-**Contents:**  
-[Setup](#setup) | [Usage](#usage) | [Artifacts](#artifacts) | [Reproducibility Notes](#reproducibility-notes) | [Acknowledgements](#acknowledgements) | [Cite](#cite)  | [Contact](#contact)
 
 ---
 
@@ -188,7 +187,7 @@ BibTeX:
 @misc{mikaberidze2025crosspromptencoderlowperforminglanguages,
   title         = {Cross-Prompt Encoder for Low-Performing Languages},
   author        = {Beso Mikaberidze and Teimuraz Saghinadze and Simon Ostermann and Philipp Muller},
-  year          = {2025},
+  year          = {2026},
   eprint        = {2508.10352},
   archivePrefix = {arXiv},
   primaryClass  = {cs.CL},
